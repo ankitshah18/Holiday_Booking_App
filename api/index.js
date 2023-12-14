@@ -87,3 +87,15 @@
 // //   res.json(null);
 // // }
 // // res.json("user info");
+
+const express = require("express");
+const app = express();
+const connectDB = require("./utils/db");
+
+const PORT = 8000;
+
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+});
