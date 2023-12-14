@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const mongoose = require("mongoose");
 const User = require("./models/User");
@@ -8,6 +9,7 @@ const User = require("./models/User");
 const app = express();
 
 const bcryptSalt = bcrypt.genSaltSync(10);
+const jwtSecret = "bookingApp";
 
 app.use(express.json());
 app.use(
@@ -46,15 +48,23 @@ app.post("/login", async (req, res) => {
   if (user) {
     const passOk = bcrypt.compareSync(password, user.password);
     if (passOk) {
-      res.status(422).json("pass Ok");
+      jwt.sign(
+        { email: user.email, id: user._id },
+        jwtSecret,
+        {},
+        (err, token) => {
+          if (err) throw err;
+          res.cookie("token", token).json(user);
+        }
+      );
     } else {
-      res.json("pass not ok");
+      res.status(422).json("pass not ok");
     }
   } else {
     res.json("not found");
   }
 });
 
-app.listen(4000, (req, res) => {
-  console.log("Lisetening on 4000");
+app.listen(5000, (req, res) => {
+  console.log("Lisetening on 5000");
 });
